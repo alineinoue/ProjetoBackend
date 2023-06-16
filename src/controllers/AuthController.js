@@ -1,6 +1,6 @@
 const {validationResult, matchedData} = require('express-validator');
 const mongoose = require('mongoose');
-const JWT = require('jsonwebtoken');
+const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const dotenv = require('dotenv');
 
@@ -19,7 +19,7 @@ module.exports = {
         //Validando o email
         const user = await User.findOne({email: data.email, password: data.password});
         if(user){
-            const token = JWT.sign(
+            const token = jwt.sign(
                 {id: user.id, email: user.email},
                 process.env.JWT_SECRET_KEY,
                 {expiresIn: '2h'}
@@ -33,32 +33,38 @@ module.exports = {
     },
     signup: async (req, res) => {
         const errors = validationResult(req);
-        if(!errors.isEmpty()){
-            res.json({error: errors.mapped()});
-            return;
+        if (!errors.isEmpty()) {
+          res.json({ error: errors.mapped() });
+          return;
         }
-
+      
         const data = matchedData(req);
-
-        //Validação se email já existe email
-        const user = await User.findOne({
-            email: data.email
-        });
-        if(user){
-            res.json({
-                error: {email: {msg: 'Email já cadastrado!'}}
-            });
-            return;
-        }
-
-        //Criação do user
-        const newUser = new User({
-            name: data.name, 
+      
+        try {
+          // Verificação se o email já existe
+          const existingUser = await User.findOne({ email: data.email });
+          if (existingUser) {
+            return res.json({ error: { email: { msg: 'Email já cadastrado!' } } });
+          }
+      
+          // Criação do usuário
+          const newUser = new User({
+            name: data.name,
             email: data.email,
-            password: data.password
-        })
-        await newUser.save();
-
-        res.json({camposvalidados: true, data});
-    }
+            password: data.password,
+          });
+          await newUser.save();
+      
+          const token = jwt.sign(
+            { id: newUser.id, email: newUser.email },
+            process.env.JWT_SECRET_KEY,
+            { expiresIn: '2h' }
+          );
+      
+          res.status(201).json({ id: newUser.id, token });
+        } catch (error) {
+          console.error(error);
+          res.status(500).json({ error: 'Erro no servidor' });
+        }
+      }      
 };
