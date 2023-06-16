@@ -21,5 +21,18 @@ module.exports = {
             },
             errorMessage: 'Senha precisa ter pelo menos 2 caracteres'
         }
+    }),
+    signin: checkSchema({
+        email: {
+            isEmail: true,
+            normalizeEmail: true, 
+            errorMessage: 'Email inválido!'
+        },
+        password: {
+            isLength: {
+                options: {min: 2}
+            },
+            errorMessage: 'Senha precisa ter pelo menos 2 caracteres'
+        }
     })
 };

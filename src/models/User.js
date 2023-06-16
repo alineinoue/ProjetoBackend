@@ -4,7 +4,7 @@ mongoose.Promise = global.Promise;
 const modelSchema = new mongoose.Schema({
     name: String,
     email: String,
-    passwordHash: String,
+    password: String,
     token: String
 });
 
