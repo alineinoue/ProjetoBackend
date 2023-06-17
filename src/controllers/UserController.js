@@ -53,7 +53,7 @@ module.exports = {
 
     try {
       // Verificar a validade do token
-      const decoded = jwt.verify(data.token, process.env.JWT_SECRET_KEY);
+      jwt.verify(data.token, process.env.JWT_SECRET_KEY);
       // O token é válido, pode prosseguir com a lógica do método
 
       let updates = {};

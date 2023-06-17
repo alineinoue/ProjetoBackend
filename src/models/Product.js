@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 mongoose.Promise = global.Promise;
 
 const modelSchema = new mongoose.Schema({
+    idUser: String,
     images: [Object],
     title: String,
     category: String,
@@ -10,7 +11,7 @@ const modelSchema = new mongoose.Schema({
     amount: Number
 });
 
-const modelName = 'Usuario';
+const modelName = 'Produto';
 
 // Verifica se já tem conexão e o model está pronto, então o model é exportado direto na conexão
 // Se não, ele irá criar.

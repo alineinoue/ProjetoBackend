@@ -1,3 +1,4 @@
 node_modules
 bd_structure.txt
 package-lock.json
+.vscode

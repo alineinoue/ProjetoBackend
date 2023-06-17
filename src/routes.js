@@ -21,7 +21,7 @@ router.post('/user/signup', AuthValidator.signup, AuthController.signup);
 router.get('/user/me', Auth.private, UserController.info);
 router.put('/user/me', UserValidator.edit, Auth.private, UserController.edit);
 
-router.get('/category', ProductController.getCategorias);
+router.get('/categories', ProductController.getCategorias);
 
 //Adicionar produto
 router.post('/product/add', Auth.private, ProductController.add);
