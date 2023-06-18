@@ -1,20 +1,8 @@
-//Manipulação das imagens
-const {v4: uuid} = require('uuid');
-const jimp = require('jimp');
-
 const Category = require('../models/Category');
 const User = require('../models/User');
 const Product = require('../models/Product');
 const jwt = require('jsonwebtoken');
 
-
-//Imagens
-const addImage = async (buffer) => {
-    let newName = `${uuid()}.jpg`;
-    let tmpImg = await jimp.read(buffer);
-    tmpImg.cover(500, 500).quality(80).write(`./public/media/${newName}`);
-    return newName;
-}
 
 
 module.exports = {
@@ -25,8 +13,7 @@ module.exports = {
 
         for(let i in cats) {
             categories.push({
-                ...cats[i]._doc,
-                img: `${process.env.BASE}/assets/images/${cats[i].slug}.png`
+                ...cats[i]._doc
             });
         }
 
@@ -71,33 +58,6 @@ module.exports = {
         newProduct.amount = amount;
         newProduct.description = description;
 
-        if(req.files && req.files.img){
-            //Apenas 1 imagem
-            if(req.files.img.length == undefined){
-                if(['image/jpeg', 'image/jpg', 'image/png'].includes(req.files.img.mimetype)){
-                    let url = await addImage(req.files.img.data);
-                    newProduct.images.push({
-                        url,
-                        default: false
-                    });
-                }
-            } else { //Mais de uma imagem
-                for(let i=0; i<req.files.img.length; i++){
-                    if(['image/jpeg', 'image/jpg', 'image/png'].includes(req.files.img[i].mimetype)){
-                        let url = await addImage(req.files.img[i].data);
-                        newProduct.images.push({
-                            url,
-                            default: false
-                        });
-                    }
-                }
-            }
-        }
-
-        if(newProduct.images.length > 0){
-            newProduct.images[0].default = true;
-        }
-
         const info = await newProduct.save();
         res.json({id: info._id});
     },
@@ -129,22 +89,12 @@ module.exports = {
     
         let products = [];
     
-        for (let i in productsData) {
-            let image;
-    
-            let defaultImg = productsData[i].images.find(e => e.default);
-            if (defaultImg) {
-                image = `${process.env.BASE}/media/${defaultImg.url}`;
-            } else {
-                image = `${process.env.BASE}/media/default.jpg`;
-            }
-    
+        for (let i in productsData) {    
             products.push({
                 id: productsData[i]._id,
                 title: productsData[i].title,
                 price: productsData[i].price,
                 description: productsData[i].description,
-                image
             });
         }
     
@@ -168,11 +118,6 @@ module.exports = {
             res.json({error: 'Produto inexistente'});
         }
 
-        let images = [];
-        for(let i in product.images){
-            images.push(`${process.env.BASE}/media/${product.images[i].url}`);
-        }
-
         let category = await Category.findById(product.category).exec();
         let userInfo = await User.findById(product.idUser).exec();
 
@@ -183,21 +128,12 @@ module.exports = {
             for(let i in otherData){
                 if(otherData[i]._id.toString() != product._id.toString()){
 
-                    let image = `${process.env.BASE}/media/default.jpg`;
-
-                    let defaultImg = otherData[i].images.find(e => e.default);
-
-                    if(defaultImg){
-                        image = `${process.env.BASE}/media/${defaultImg.url}`;
-                    }
-
                     others.push({
                         id: otherData[i]._id,
                         title: otherData[i].title,
                         price: otherData[i].price,
                         description: otherData[i].description,
                         amount: otherData[i].amount,
-                        image
                     })
 
                 } 
@@ -210,7 +146,6 @@ module.exports = {
             price: product.price,
             description: product.description,
             amount: product.amount,
-            images,
             category, 
             userInfo: {
                 name: userInfo.name,
@@ -221,7 +156,7 @@ module.exports = {
     },
     edit: async (req, res) => {
         let { id } = req.params;
-        let { title, price, description, amount, images, cat, token } = req.body;
+        let { title, price, description, amount, cat, token } = req.body;
     
         if (id.length < 12) {
             res.json({ error: 'ID inválido' });
@@ -276,14 +211,10 @@ module.exports = {
             }
             updates.category = category._id.toString();
         }
-    
-        if (images) {
-            updates.images = images;
-        }
-    
+
         await Product.findByIdAndUpdate(id, { $set: updates });
     
-        res.json({ error: '' });
+        res.json({ mensagem: 'Produto editado com sucesso!' });
     },
     
 };

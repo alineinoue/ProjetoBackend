@@ -23,7 +23,6 @@ module.exports = {
 
         productList.push({
           id: products[i]._id,
-          images: products[i].images,
           title: products[i].title,
           price: products[i].price,
           description: products[i].description,
