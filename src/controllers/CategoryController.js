@@ -25,8 +25,7 @@ module.exports = {
         const user = await User.findById(decoded.id);
 
         if(!name || !slug){
-            res.json({error: 'Nome e/ou slug da categoria não foram preenchidos'});
-            return;
+            return res.status(422).json({ error: 'Nome e/ou slug da categoria não foram preenchidos' });
         }
 
         const newCategory = new Category();
@@ -41,14 +40,12 @@ module.exports = {
         let { name, slug, token } = req.body;
     
         if (id.length < 12) {
-            res.json({ error: 'ID inválido' });
-            return;
+            return res.status(400).json({ error: 'ID inválido' });
         }
     
         const category = await Category.findById(id).exec();
         if (!category) {
-            res.json({ error: 'Categoria não encontrada!' });
-            return;
+            return res.status(404).json({ error: 'Categoria não encontrada!' });
         }
     
         let user;
@@ -56,8 +53,7 @@ module.exports = {
             const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
             user = await User.findById(decoded.id);
         } catch (error) {
-            res.json({ error: 'Token inválido' });
-            return;
+            return res.status(401).json({ error: 'Token inválido' });
         }
     
         let updates = {};
@@ -72,32 +68,29 @@ module.exports = {
 
         await Category.findByIdAndUpdate(id, { $set: updates });
     
-        res.json({ mensagem: 'Categoria editada com sucesso!' });
+        res.status(200).json({ mensagem: 'Categoria editada com sucesso!' });
     },
     delete: async (req, res) => {
         const { id } = req.params;
     
         if (id.length < 12) {
-            res.json({ error: 'ID inválido' });
-            return;
+            return res.status(400).json({ error: 'ID inválido' });
         }
     
         try {
             const category = await Category.findById(id).exec();
             if (!category) {
-                res.json({ error: 'Categoria não encontrada!' });
-                return;
+                return res.status(404).json({ error: 'Categoria não encontrada!' });
             }
     
             const productsWithCategory = await Product.find({ category: id }).exec();
             if (productsWithCategory.length > 0) {
-                res.json({ error: 'Não é possível excluir a categoria, pois ela está associada a um ou mais produtos.' });
-                return;
+                return res.status(409).json({ error: 'Não é possível excluir a categoria, pois ela está associada a um ou mais produtos.' });
             }
     
             await Category.deleteOne({ _id: id });
     
-            res.json({ mensagem: 'Categoria excluída com sucesso!' });
+            res.status(200).json({ mensagem: 'Categoria excluída com sucesso!' });
         } catch (error) {
             console.error(error);
             res.status(500).json({ error: 'Erro no servidor' });

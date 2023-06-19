@@ -25,10 +25,9 @@ module.exports = {
                 { expiresIn: '2h' }
             );
 
-            res.json({ msg: 'Logado com sucesso!', name: user.name, token: token });
-            return;
+            return res.status(200).json({ msg: 'Logado com sucesso!', name: user.name, token: token });
         } else {
-            res.json({ error: 'Email e/ou senha errados!' });
+            res.status(401).json({ error: 'Email e/ou senha errados!' });
         }
     },
     signup: async (req, res) => {
@@ -44,7 +43,7 @@ module.exports = {
             // Verificação se o email já existe
             const existingUser = await User.findOne({ email: data.email });
             if (existingUser) {
-                return res.json({ error: { email: { msg: 'Email já cadastrado!' } } });
+                return res.status(409).json({ error: { email: { msg: 'Email já cadastrado!' } } });
             }
 
             // Criação do usuário

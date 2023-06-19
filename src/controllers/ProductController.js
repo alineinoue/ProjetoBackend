@@ -13,13 +13,11 @@ module.exports = {
         const user = await User.findById(decoded.id);
 
         if(!title || !cat){
-            res.json({error: 'Titulo e/ou categoria não foram preenchidos'});
-            return;
+            return res.status(422).json({error: 'Titulo e/ou categoria não foram preenchidos'});
         }
 
         if(cat.length < 12){
-            res.json({error: 'ID de categoria inválido!'});
-            return;
+            return res.status(400).json({error: 'ID de categoria inválido!'});
         }
 
         const category = await Category.findById(cat);
@@ -89,18 +87,18 @@ module.exports = {
         let {id, other = null} = req.query;
 
         if(!id){
-            res.json({error: 'Sem produto'});
-            return;
+            res.status(400).json({ error: 'Sem produto' });
+            return;            
         }
 
         if(id.length < 12){
-            res.json({error: 'ID inválido'});
-            return;
+            res.status(400).json({ error: 'ID inválido' });
+            return;            
         }   
 
         const product = await Product.findById(id);
         if(!product){
-            res.json({error: 'Produto inexistente'});
+            res.status(404).json({ error: 'Produto inexistente' });
         }
 
         let category = await Category.findById(product.category).exec();
@@ -144,14 +142,12 @@ module.exports = {
         let { title, price, description, amount, cat, token } = req.body;
     
         if (id.length < 12) {
-            res.json({ error: 'ID inválido' });
-            return;
+            return res.status(400).json({ error: 'ID inválido' });
         }
     
         const product = await Product.findById(id).exec();
         if (!product) {
-            res.json({ error: 'Produto não encontrado!' });
-            return;
+            return res.status(404).json({ error: 'Produto não encontrado!' });
         }
     
         let user;
@@ -159,12 +155,11 @@ module.exports = {
             const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
             user = await User.findById(decoded.id);
         } catch (error) {
-            res.json({ error: 'Token inválido' });
-            return;
+            return res.status(401).json({ error: 'Token inválido' });
         }
     
         if (user && user._id.toString() !== product.idUser) {
-            res.json({ error: "Você não tem permissão para modificar este produto" });
+            res.status(401).json({ error: "Você não tem permissão para modificar este produto" });
             return;
         }
     
@@ -191,34 +186,32 @@ module.exports = {
         if (cat) {
             const category = await Category.findOne({ slug: cat }).exec();
             if (!category) {
-                res.json({ error: 'Categoria não existe' });
-                return;
+                return res.status(404).json({ error: 'Categoria não existe!' });
             }
             updates.category = category._id.toString();
         }
 
         await Product.findByIdAndUpdate(id, { $set: updates });
     
-        res.json({ mensagem: 'Produto editado com sucesso!' });
+        res.status(200).json({ mensagem: 'Produto editado com sucesso!' });
+
     },
     delete: async (req, res) => {
         const { id } = req.params;
     
         if (id.length < 12) {
-            res.json({ error: 'ID inválido' });
-            return;
+            return res.status(400).json({ error: 'ID inválido' });
         }
     
         try {
             const product = await Product.findById(id).exec();
             if (!product) {
-                res.json({ error: 'Produto não encontrado!' });
-                return;
+                return res.status(404).json({ error: 'Produto não encontrado!' });
             }
     
             await Product.deleteOne({ _id: id });
     
-            res.json({ mensagem: 'Produto excluído com sucesso!' });
+            res.status(200).json({ mensagem: 'Produto excluído com sucesso!' });
         } catch (error) {
             console.error(error);
             res.status(500).json({ error: 'Erro no servidor' });

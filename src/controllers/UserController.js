@@ -72,7 +72,7 @@ module.exports = {
   
       await user.save();
   
-      res.json({ message: 'Usuário atualizado com sucesso' });
+      res.status(200).json({ message: 'Usuário atualizado com sucesso' });
     } catch (error) {
       // O token é inválido ou expirou, retornar uma resposta de erro
       res.status(401).json({ error: 'Token inválido ou expirado' });

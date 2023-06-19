@@ -96,8 +96,8 @@ module.exports = {
         try {
           // Verifica se o usuário logado é um administrador
           if (!req.user.isAdmin) {
-            res.json({ error: 'Apenas usuários administradores podem editar outros usuários' });
-            return;
+            res.status(403).json({ error: 'Apenas usuários administradores podem editar outros usuários' });
+            return;            
           }
       
           const errors = validationResult(req);
@@ -121,7 +121,7 @@ module.exports = {
           if (data.email) {
             const emailCheck = await User.findOne({ email: data.email });
             if (emailCheck) {
-              res.json({ error: 'Email já existe!' });
+              res.status(409).json({ error: 'Email já existe!' });
               return;
             }
             updates.email = data.email;
@@ -133,7 +133,7 @@ module.exports = {
       
           await User.findOneAndUpdate({ _id: id }, { $set: updates });
       
-          res.json({ mensagem: 'Usuário editado com sucesso!' });
+          res.status(200).json({ mensagem: 'Usuário editado com sucesso!' });
         } catch (error) {
           console.error(error);
           res.status(500).json({ error: 'Erro no servidor' });
