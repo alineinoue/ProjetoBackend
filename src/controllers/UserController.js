@@ -69,6 +69,10 @@ module.exports = {
       if (data.email) {
         user.email = data.email;
       }
+
+      if (data.password) {
+        user.password = data.password;
+      }
   
       await user.save();
   

@@ -6,12 +6,15 @@ const Auth = require('./middlewares/Auth');
 const AuthValidator = require('./validators/AuthValidator');
 const UserValidator = require('./validators/UserValidator');
 
-
 const AuthController = require('./controllers/AuthController');
 const UserController = require('./controllers/UserController');
 const ProductController = require('./controllers/ProductController');
 const CategoryController = require('./controllers/CategoryController');
 const AdminController = require('./controllers/AdminController');
+const InstallController = require('./controllers/InstallController');
+
+// Rota de instalação do banco de dados
+router.get('/install', InstallController.installDatabase);
 
 //Cadastro usuário
 router.post('/user/signup', AuthValidator.signup, AuthController.signup);
