@@ -7,7 +7,7 @@ const jwt = require('jsonwebtoken');
 
 module.exports = {
     add: async (req, res) => {
-        let {title, price, description, amount, cat, token} = req.body;
+        let {title, price, description, cat, token} = req.body;
 
         const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
         const user = await User.findById(decoded.id);
@@ -121,7 +121,6 @@ module.exports = {
                         title: otherData[i].title,
                         price: otherData[i].price,
                         description: otherData[i].description,
-                        amount: otherData[i].amount,
                     })
 
                 } 
@@ -133,7 +132,6 @@ module.exports = {
             title: product.title,
             price: product.price,
             description: product.description,
-            amount: product.amount,
             category, 
             userInfo: {
                 name: userInfo.name,
@@ -144,7 +142,7 @@ module.exports = {
     },
     edit: async (req, res) => {
         let { id } = req.params;
-        let { title, price, description, amount, cat, token } = req.body;
+        let { title, price, description, cat, token } = req.body;
     
         if (id.length < 12) {
             return res.status(400).json({ error: 'ID inválido' });
@@ -178,10 +176,6 @@ module.exports = {
             price = price.replace('.', '').replace(',', '.').replace('R$', '');
             price = parseFloat(price);
             updates.price = price;
-        }
-    
-        if (amount) {
-            updates.amount = amount;
         }
     
         if (description) {
