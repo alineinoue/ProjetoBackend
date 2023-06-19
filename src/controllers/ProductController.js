@@ -45,44 +45,49 @@ module.exports = {
         res.json({id: info._id});
     },
     getList: async (req, res) => {
-        let {limit = 5, q, cat, page } = req.query;
+        let { limit = 5, q, cat, page } = req.query;
         let total = 0;
-        let filters = {}; 
-    
+        let filters = {};
+      
+        // Verifica se o valor do limit está entre 5, 10 ou 30
+        if (![5, 10, 30].includes(parseInt(limit))) {
+          return res.status(400).json({ error: 'Valor inválido para o parâmetro limit, o valor deve ser 5, 10 ou 30' });
+        }
+      
         if (q) {
-            filters.title = { '$regex': q, '$options': 'i' };
+          filters.title = { '$regex': q, '$options': 'i' };
         }
-    
+      
         if (cat) {
-            const c = await Category.findOne({ slug: cat }).exec();
-            if (c) {
-                filters.category = c._id.toString();
-            }
+          const c = await Category.findOne({ slug: cat }).exec();
+          if (c) {
+            filters.category = c._id.toString();
+          }
         }
-    
+      
         const productsTotal = await Product.find(filters).exec();
         total = productsTotal.length;
-
+      
         const startIndex = (page - 1) * limit;
-
+      
         const productsData = await Product.find(filters)
-            .skip(startIndex)
-            .limit(parseFloat(limit))
-            .exec();
-    
+          .skip(startIndex)
+          .limit(parseFloat(limit))
+          .exec();
+      
         let products = [];
-    
-        for (let i in productsData) {    
-            products.push({
-                id: productsData[i]._id,
-                title: productsData[i].title,
-                price: productsData[i].price,
-                description: productsData[i].description,
-            });
+      
+        for (let i in productsData) {
+          products.push({
+            id: productsData[i]._id,
+            title: productsData[i].title,
+            price: productsData[i].price,
+            description: productsData[i].description,
+          });
         }
-    
+      
         res.json({ products, total });
-    },    
+    },      
     getItem: async (req, res) => {
         let {id, other = null} = req.query;
 
