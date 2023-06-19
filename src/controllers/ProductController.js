@@ -216,5 +216,27 @@ module.exports = {
     
         res.json({ mensagem: 'Produto editado com sucesso!' });
     },
+    delete: async (req, res) => {
+        const { id } = req.params;
     
+        if (id.length < 12) {
+            res.json({ error: 'ID inválido' });
+            return;
+        }
+    
+        try {
+            const product = await Product.findById(id).exec();
+            if (!product) {
+                res.json({ error: 'Produto não encontrado!' });
+                return;
+            }
+    
+            await Product.deleteOne({ _id: id });
+    
+            res.json({ mensagem: 'Produto excluído com sucesso!' });
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ error: 'Erro no servidor' });
+        }
+    },
 };
