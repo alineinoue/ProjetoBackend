@@ -3,7 +3,6 @@ const User = require('../models/User');
 const Product = require('../models/Product');
 const jwt = require('jsonwebtoken');
 
-
 module.exports = {
     getCategorias: async (req, res) => {
         const cats = await Category.find();

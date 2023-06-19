@@ -5,29 +5,32 @@ const dotenv = require('dotenv');
 dotenv.config();
 
 module.exports = {
-    private: async (req, res, next) => {
-        let success = false;
+  private: async (req, res, next) => {
+    try {
+      // Verificação de autenticação
+      if (!req.headers.authorization || !req.headers.authorization.startsWith('Bearer ')) {
+        res.status(403).json({ error: 'Não autorizado' });
+        return;
+      }
 
-        //Verificação de auth
-        if(req.headers.authorization){
-            const [authType, token] = req.headers.authorization.split(' ');
-            if(authType === 'Bearer'){
-                try{
-                    jwt.verify(token, process.env.JWT_SECRET_KEY);
+      const token = req.headers.authorization.split(' ')[1];
+      const decodedToken = jwt.verify(token, process.env.JWT_SECRET_KEY);
+      
+      // Buscar o usuário no banco de dados com base no ID do token
+      const user = await User.findById(decodedToken.id);
+      
+      if (!user) {
+        res.status(403).json({ error: 'Não autorizado' });
+        return;
+      }
 
-                    success = true;
-                } catch(err){
+      // Definir o usuário autenticado em req.user
+      req.user = user;
 
-                }
-            }
-        }
-
-        if(success){
-            next();
-        } else {
-            res.status(403); //Not authorized
-            res.json({error: 'Não autorizado'});
-        }
-
+      next();
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: 'Erro no servidor' });
     }
-}
+  }
+};

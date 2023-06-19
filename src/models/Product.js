@@ -3,12 +3,10 @@ mongoose.Promise = global.Promise;
 
 const modelSchema = new mongoose.Schema({
     idUser: String,
-    images: [Object],
     title: String,
     category: String,
     price: Number, 
     description: String,
-    amount: Number
 });
 
 const modelName = 'Produto';

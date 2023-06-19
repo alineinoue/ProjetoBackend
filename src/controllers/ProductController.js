@@ -6,20 +6,6 @@ const jwt = require('jsonwebtoken');
 
 
 module.exports = {
-    getCategorias: async (req, res) => {
-        const cats = await Category.find();
-
-        let categories = [];
-
-        for(let i in cats) {
-            categories.push({
-                ...cats[i]._doc
-            });
-        }
-
-        res.json({categories});
-
-    },
     add: async (req, res) => {
         let {title, price, description, amount, cat, token} = req.body;
 
@@ -55,7 +41,6 @@ module.exports = {
         newProduct.category = cat;
         newProduct.title = title;
         newProduct.price = price;
-        newProduct.amount = amount;
         newProduct.description = description;
 
         const info = await newProduct.save();

@@ -14,7 +14,7 @@ module.exports = {
       // O token é válido, pode prosseguir com a lógica do método
       
       const user = await User.findById(decoded.id);
-      const products = await Product.findOne({ idUser: user._id.toString() });
+      const products = await Product.find({ idUser: user._id.toString() });
 
       let productList = [];
 
@@ -34,7 +34,7 @@ module.exports = {
       res.json({
         name: user.name,
         email: user.email,
-        product: productList,
+        products: productList,
       });
     } catch (error) {
       // O token é inválido ou expirou, retornar uma resposta de erro
@@ -44,42 +44,38 @@ module.exports = {
   edit: async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      res.json({ error: errors.mapped() });
+      res.status(400).json({ error: errors.array() });
       return;
     }
-
+  
     const data = matchedData(req);
-
+    const token = data.token;
+  
     try {
       // Verificar a validade do token
-      jwt.verify(data.token, process.env.JWT_SECRET_KEY);
+      const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
       // O token é válido, pode prosseguir com a lógica do método
-
-      let updates = {};
-        
-      if(data.name){
-          updates.name = data.name;
+  
+      const user = await User.findById(decoded.id);
+      if (!user) {
+        res.status(404).json({ error: 'Usuário não encontrado' });
+        return;
       }
-
-      if(data.email){
-          const emailCheck = await User.findOne({email: data.email});
-          if(emailCheck){
-              res.json({error: 'Email já existe!'});
-              return;
-          }
-          updates.email = data.email;
+  
+      if (data.name) {
+        user.name = data.name;
       }
-
-      if(data.password){
-          updates.password = data.password;
+  
+      if (data.email) {
+        user.email = data.email;
       }
-
-      await User.findOneAndUpdate({token: data.token}, {$set: updates});
-
-      res.json({});
+  
+      await user.save();
+  
+      res.json({ message: 'Usuário atualizado com sucesso' });
     } catch (error) {
       // O token é inválido ou expirou, retornar uma resposta de erro
       res.status(401).json({ error: 'Token inválido ou expirado' });
     }
-  },
+  },  
 };

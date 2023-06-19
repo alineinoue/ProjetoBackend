@@ -25,7 +25,7 @@ module.exports = {
                 { expiresIn: '2h' }
             );
 
-            res.json({ status: true, token });
+            res.json({ msg: 'Logado com sucesso!', name: user.name, token: token });
             return;
         } else {
             res.json({ error: 'Email e/ou senha errados!' });
@@ -58,16 +58,16 @@ module.exports = {
                 process.env.JWT_SECRET_KEY,
                 { expiresIn: '2h' }
             );
-            
+
             newUser.token = token; // Atribuir o valor do token depois de inicializá-lo
             await newUser.save();
 
-            res.status(201).json({ mensagem: 'Usuário criado com sucesso!', id: newUser.id});
+            res.status(201).json({ mensagem: 'Usuário criado com sucesso!', id: newUser.id });
 
 
         } catch (error) {
             console.error(error);
             res.status(500).json({ error: 'Erro no servidor' });
         }
-    }
+    },
 };
