@@ -32,8 +32,8 @@ const InstallController = {
         { name: 'Usuário 1', email: 'usuario1@hotmail.com', password: '123', isAdmin: false, idUser: new ObjectID('649085fca2610a126f09f9db') },
         { name: 'Usuário 2', email: 'usuario2@hotmail.com', password: '123', isAdmin: false, idUser: new ObjectID('648f74c7ee35374897b570b4') },
         { name: 'Usuário Administrador', email: 'admin@hotmail.com', password: '123', isAdmin: true, idUser: new ObjectID('648f74c7ee35374897b570b4') },
-        { name: 'Usuário Administrador 2', email: 'admin2@hotmail.com', password: '123', isAdmin: true, idUser: new ObjectID('648d21b252d560b4b01a1370')},
-        { name: 'Usuário 3', email: 'usuario3@hotmail.com', password: '123', isAdmin: false, idUser: new ObjectID('649085fca2610a126f09f9db')}
+        { name: 'Usuário 3', email: 'usuario3@hotmail.com', password: '123', isAdmin: false, idUser: new ObjectID('649085fca2610a126f09f9db')},
+        { name: 'Usuário 4', email: 'usuario4@hotmail.com', password: '123', isAdmin: false, idUser: new ObjectID('648d21b252d560b4b01a1370')}
       ]);
 
       res.json({ message: 'Banco de dados instalado com sucesso!' });

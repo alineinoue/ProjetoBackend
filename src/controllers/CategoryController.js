@@ -5,13 +5,27 @@ const jwt = require('jsonwebtoken');
 
 module.exports = {
     getCategorias: async (req, res) => {
-        const cats = await Category.find();
+        let {limit = 5, page} = req.query;
+
+        // Verifica se o valor do limit está entre 5, 10 ou 30
+        if (![5, 10, 30].includes(parseInt(limit))) {
+          return res.status(400).json({ error: 'Valor inválido para o parâmetro limit, o valor deve ser 5, 10 ou 30' });
+        }
+
+        const startIndex = (page - 1) * limit;
+
+        const cats = await Category.find()
+          .skip(startIndex)
+          .limit(parseFloat(limit))
+          .exec();
 
         let categories = [];
 
         for(let i in cats) {
             categories.push({
-                ...cats[i]._doc
+                id: cats[i]._id,
+                name: cats[i].name,
+                slug: cats[i].slug,
             });
         }
 
