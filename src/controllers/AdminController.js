@@ -23,13 +23,13 @@ module.exports = {
           const decodedToken = jwt.verify(token, process.env.JWT_SECRET_KEY);
           const user = await User.findById(decodedToken.id);
           if (!user || !user.isAdmin) {
-            return res.json({ error: 'Apenas administradores podem criar outros administradores' });
+            return res.status(401).json({ error: 'Apenas administradores podem criar outros administradores' });
           }
       
           // Verificar se o email já existe
           const existingUser = await User.findOne({ email: data.email });
           if (existingUser) {
-            return res.json({ error: { email: { msg: 'Email já cadastrado!' } } });
+            return res.status(409).json({ error: { email: { msg: 'Email já cadastrado!' } } });
           }
       
           // Criação do usuário
@@ -66,19 +66,19 @@ module.exports = {
         try {
           const user = await User.findById(id).exec();
           if (!user) {
-            res.json({ error: 'Usuário não encontrado!' });
+            res.status(404).json({ error: 'Usuário não encontrado!' });
             return;
           }
       
           // Verificar se o usuário é um administrador
           if (!req.user.isAdmin) {
-            res.json({ error: 'Apenas usuários administradores podem excluir outros usuários!' });
+            res.status(403).json({ error: 'Apenas usuários administradores podem excluir outros usuários!' });
             return;
           }
       
           // Verificar se o usuário a ser excluído também é um administrador
           if (user.isAdmin) {
-            res.json({ error: 'Não é possível excluir um usuário administrador!' });
+            res.status(403).json({ error: 'Não é possível excluir um usuário administrador!' });
             return;
           }
       
